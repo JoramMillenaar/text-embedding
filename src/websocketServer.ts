@@ -1,9 +1,8 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { MockEmbeddingService } from '../tests/mocks';
-import { MockTextProcessingService } from '../tests/mocks';
-import { MockTextChunkingService } from '../tests/mocks';
+import { XenovaEmbeddingService } from './services/EmbeddingService.js';
+import { MockTextProcessingService, MockTextChunkingService } from '../tests/mocks.js';
 
-const embeddingService = new MockEmbeddingService();
+const embeddingService = new XenovaEmbeddingService();
 const textProcessingService = new MockTextProcessingService();
 const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens());
 

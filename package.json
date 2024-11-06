@@ -1,11 +1,12 @@
 {
   "name": "textembedding",
+  "type": "module",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
-      "api": "npx ts-node src/app.ts",
-      "ws": "npx ts-node src/websocketServer.ts",
-      "test-ws": "npx ts-node tests/wsTest.ts"
+    "build": "tsc",
+    "start": "node dist/src/websocketServer.js",
+    "test": "node dist/tests/wsTest.js"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +17,6 @@
     "body-parser": "^1.20.3",
     "express": "^4.21.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
     "ws": "^8.18.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
-import { ITextProcessingService } from '../src/services/TextProcessingService';
-import { TextChunkingServiceBase } from '../src/services/TextChunkingService';
-import { IEmbeddingService } from '../src/services/EmbeddingService';
+import { ITextProcessingService } from '../src/services/TextProcessingService.js';
+import { TextChunkingServiceBase } from '../src/services/TextChunkingService.js';
+import { IEmbeddingService } from '../src/services/EmbeddingService.js';
 
 
 export class MockEmbeddingService implements IEmbeddingService {
