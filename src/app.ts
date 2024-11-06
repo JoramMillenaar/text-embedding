@@ -3,8 +3,6 @@ import bodyParser from 'body-parser';
 import { MockEmbeddingService } from '../tests/mocks';
 import { MockTextProcessingService } from '../tests/mocks';
 import { MockTextChunkingService } from '../tests/mocks';
-import { TextEmbeddingController } from './controllers/TextEmbeddingController'
-
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,8 +10,6 @@ app.use(bodyParser.json());
 const embeddingService = new MockEmbeddingService();
 const textProcessingService = new MockTextProcessingService();
 const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens());
-
-const textEmbeddingController = new TextEmbeddingController(textProcessingService, textChunkingService, embeddingService);
 
 const embeddingsHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -23,14 +19,22 @@ const embeddingsHandler: RequestHandler = async (req: Request, res: Response): P
             return;
         }
 
-        const embeddings = await textEmbeddingController.getEmbeddings(text);
+        // Process and chunk the text
+        const processedText = textProcessingService.processText(text);
+        const chunks = textChunkingService.chunkText(processedText);
+
+        // Generate embeddings for each chunk
+        const embeddings = await Promise.all(chunks.map(chunk => embeddingService.generateEmbedding(chunk)));
+
+        // Send the embeddings as JSON response
         res.json({ embeddings });
     } catch (error) {
+        console.error('Error generating embeddings:', error);
         res.status(500).json({ error: 'Failed to generate embeddings' });
     }
 };
 
-
+// Define the /embeddings route with the handler
 app.post('/embeddings', embeddingsHandler);
 
 const PORT = 3000;
