@@ -11,6 +11,10 @@ export class MockEmbeddingService implements IEmbeddingService {
     getMaxTokens(): number {
         return 200
     }
+
+    countTokens(text: string): number {
+        return text.split(' ').length;
+    }
 }
 
 

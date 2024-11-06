@@ -1,15 +1,14 @@
 import express, { Request, Response, RequestHandler } from 'express';
 import bodyParser from 'body-parser';
-import { MockEmbeddingService } from '../tests/mocks';
-import { MockTextProcessingService } from '../tests/mocks';
-import { MockTextChunkingService } from '../tests/mocks';
+import { MockTextProcessingService, MockTextChunkingService } from '../tests/mocks.js';
+import { XenovaEmbeddingService } from './services/EmbeddingService.js';
 
 const app = express();
 app.use(bodyParser.json());
 
-const embeddingService = new MockEmbeddingService();
+const embeddingService = new XenovaEmbeddingService();
 const textProcessingService = new MockTextProcessingService();
-const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens());
+const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens() / 2);
 
 const embeddingsHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -23,11 +22,15 @@ const embeddingsHandler: RequestHandler = async (req: Request, res: Response): P
         const processedText = textProcessingService.processText(text);
         const chunks = textChunkingService.chunkText(processedText);
 
-        // Generate embeddings for each chunk
-        const embeddings = await Promise.all(chunks.map(chunk => embeddingService.generateEmbedding(chunk)));
-
-        // Send the embeddings as JSON response
-        res.json({ embeddings });
+        // Generate embeddings and format each chunk with its embedding
+        const response = await Promise.all(
+            chunks.map(async (chunk) => {
+                const embedding = await embeddingService.generateEmbedding(chunk);
+                const embeddingArray = Array.isArray(embedding) ? embedding : Object.values(embedding);
+                return { chunk, embedding: embeddingArray };
+            })
+        );
+        res.json(response);
     } catch (error) {
         console.error('Error generating embeddings:', error);
         res.status(500).json({ error: 'Failed to generate embeddings' });

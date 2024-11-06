@@ -5,7 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/src/websocketServer.js",
+    "start-ws": "node dist/src/websocketServer.js",
+    "start-api": "node dist/src/app.js",
     "test": "node dist/tests/wsTest.js"
   },
   "keywords": [],
