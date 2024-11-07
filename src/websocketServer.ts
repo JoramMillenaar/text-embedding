@@ -1,10 +1,10 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { XenovaEmbeddingService } from './services/EmbeddingService.js';
-import { MockTextProcessingService, MockTextChunkingService } from '../tests/mocks.js';
+import { TokenBasedTextChunkingService } from './services/TextChunkingService.js';
 
 const embeddingService = new XenovaEmbeddingService();
-const textProcessingService = new MockTextProcessingService();
-const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens());
+await embeddingService.ready()
+const textChunkingService = new TokenBasedTextChunkingService(embeddingService.getMaxTokens());
 
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
@@ -16,8 +16,7 @@ wss.on('connection', (ws: WebSocket) => {
         const text = message.toString();
         console.log('Received message:', text);
 
-        const processedText = textProcessingService.processText(text);
-        const chunks = textChunkingService.chunkText(processedText);
+        const chunks = await textChunkingService.chunkText(text);
 
         for (const chunk of chunks) {
             try {

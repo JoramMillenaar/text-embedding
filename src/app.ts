@@ -1,14 +1,14 @@
 import express, { Request, Response, RequestHandler } from 'express';
 import bodyParser from 'body-parser';
-import { MockTextProcessingService, MockTextChunkingService } from '../tests/mocks.js';
+import { TokenBasedTextChunkingService } from './services/TextChunkingService.js';
 import { XenovaEmbeddingService } from './services/EmbeddingService.js';
 
 const app = express();
 app.use(bodyParser.json());
 
 const embeddingService = new XenovaEmbeddingService();
-const textProcessingService = new MockTextProcessingService();
-const textChunkingService = new MockTextChunkingService(embeddingService.getMaxTokens() / 2);
+await embeddingService.ready();
+const textChunkingService = new TokenBasedTextChunkingService(embeddingService.getMaxTokens());
 
 const embeddingsHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -19,8 +19,7 @@ const embeddingsHandler: RequestHandler = async (req: Request, res: Response): P
         }
 
         // Process and chunk the text
-        const processedText = textProcessingService.processText(text);
-        const chunks = textChunkingService.chunkText(processedText);
+        const chunks = await textChunkingService.chunkText(text);
 
         // Generate embeddings and format each chunk with its embedding
         const response = await Promise.all(

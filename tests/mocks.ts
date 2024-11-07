@@ -1,4 +1,3 @@
-import { ITextProcessingService } from '../src/services/TextProcessingService.js';
 import { TextChunkingServiceBase } from '../src/services/TextChunkingService.js';
 import { IEmbeddingService } from '../src/services/EmbeddingService.js';
 
@@ -18,19 +17,12 @@ export class MockEmbeddingService implements IEmbeddingService {
 }
 
 
-export class MockTextProcessingService implements ITextProcessingService {
-    processText(text: string): string {
-        return text.toLowerCase();
-    }
-}
-
-
 export class MockTextChunkingService extends TextChunkingServiceBase {
     constructor(chunkSize: number) {
         super(chunkSize);
     }
 
-    chunkText(text: string): string[] {
+    async chunkText(text: string): Promise<string[]> {
         const chunks: string[] = [];
         for (let i = 0; i < text.length; i += this.chunkSize) {
             chunks.push(text.substring(i, i + this.chunkSize));
