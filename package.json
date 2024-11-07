@@ -2,7 +2,7 @@
   "name": "textembedding",
   "type": "module",
   "version": "1.0.0",
-  "main": "app.ts",
+  "main": "api.ts",
   "scripts": {
     "build": "tsc",
     "start-ws": "tsc && node dist/src/websocketServer.js",

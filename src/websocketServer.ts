@@ -1,13 +1,9 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { XenovaEmbeddingService } from './services/EmbeddingService.js';
-import { TokenBasedTextChunkingService } from './services/TextChunkingService.js';
-
-const embeddingService = new XenovaEmbeddingService();
-await embeddingService.ready()
-const textChunkingService = new TokenBasedTextChunkingService(embeddingService.getMaxTokens());
+import { XenovaEmbeddingService } from './embedding.js';
 
 const PORT = 8080;
 const wss = new WebSocketServer({ port: PORT });
+const embeddingService = new XenovaEmbeddingService();
 
 wss.on('connection', (ws: WebSocket) => {
     console.log('Client connected');
@@ -16,19 +12,13 @@ wss.on('connection', (ws: WebSocket) => {
         const text = message.toString();
         console.log('Received message:', text);
 
-        const chunks = await textChunkingService.chunkText(text);
-
-        for (const chunk of chunks) {
-            try {
-                const embedding = await embeddingService.generateEmbedding(chunk);
-                const embeddingArray = Array.isArray(embedding) ? embedding: Object.values(embedding);
-                ws.send(JSON.stringify({ chunk, embedding: embeddingArray }));
-            } catch (error) {
-                ws.send(JSON.stringify({ error: 'Failed to generate embedding' }));
-            }
+        try {
+            const embeddings = await embeddingService.generateEmbeddingChunks(text);
+            ws.send(JSON.stringify({ embeddings }));
+        } catch (error) {
+            console.error('Error generating embeddings:', error);
+            ws.send(JSON.stringify({ error: 'Failed to generate embeddings' }));
         }
-
-        ws.send(JSON.stringify({ status: 'done' }));
     });
 
     ws.on('close', () => {
