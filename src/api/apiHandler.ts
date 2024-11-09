@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { XenovaEmbeddingService } from './embedding.js';
+import { XenovaEmbeddingService } from '../services/xenovaEmbeddingService.js';
 
 const app = express();
 app.use(bodyParser.json());
 
 const embeddingService = new XenovaEmbeddingService();
 
-const embeddingsHandler = async (req: Request, res: Response): Promise<void> => {
+export async function apiHandler(req: Request, res: Response): Promise<void> {
     try {
         const { text } = req.body;
         if (!text) {
@@ -24,7 +24,7 @@ const embeddingsHandler = async (req: Request, res: Response): Promise<void> => 
 };
 
 // Define the /embeddings route with the handler
-app.post('/embeddings', embeddingsHandler);
+app.post('/embeddings', apiHandler);
 
 const PORT = 3000;
 app.listen(PORT, () => {

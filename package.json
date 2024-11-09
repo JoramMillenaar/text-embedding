@@ -1,13 +1,17 @@
 {
-  "name": "textembedding",
+  "name": "text-to-embedding",
   "type": "module",
   "version": "1.0.0",
-  "main": "api.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "start-ws": "tsc && node dist/src/websocketServer.js",
-    "start-api": "tsc && node dist/src/app.js",
-    "test": "node dist/tests/wsTest.js"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +26,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
-    "@types/ws": "^8.5.13"
+    "@types/ws": "^8.5.13",
+    "typescript": "^4.5.2"
   }
 }

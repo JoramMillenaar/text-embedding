@@ -1,4 +1,3 @@
-
 export class XenovaEmbeddingService {
     private model: any = null;
     private initialized: Promise<void>;
@@ -43,15 +42,11 @@ export class XenovaEmbeddingService {
         const chunks: string[] = [];
         let currentChunk: string[] = [];
 
-        // Split text into sentences
-        const sentences = text.match(/[^.!?]+[.!?]*/g) || [text]; // Fallback to treat whole text as one sentence if no match
-
+        const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
         let tokenCount = 0;
 
         for (const sentence of sentences) {
             const sentenceTokenCount = await this.countTokens(sentence);
-
-            // If adding the sentence would exceed the chunk size, finalize the current chunk
             if (tokenCount + sentenceTokenCount > this.getMaxTokens()) {
                 if (currentChunk.length > 0) {
                     chunks.push(currentChunk.join(' '));
@@ -59,13 +54,10 @@ export class XenovaEmbeddingService {
                     tokenCount = 0;
                 }
             }
-
-            // Add sentence to current chunk
             currentChunk.push(sentence);
             tokenCount += sentenceTokenCount;
         }
 
-        // Add any remaining text in the final chunk
         if (currentChunk.length > 0) {
             chunks.push(currentChunk.join(' '));
         }
